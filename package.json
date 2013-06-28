@@ -1,0 +1,38 @@
+{
+  "name": "templ",
+  "version": "0.0.0",
+  "description": "yet another lightweight templating thing",
+  "main": "index.js",
+  "dependencies": {
+    "saw": "~0.4.4",
+    "handlebars": "~1.0.12",
+    "graceful-fs": "~1.2.2",
+    "dish": "~0.1.2"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "middler": "~0.6.1",
+    "request": "~2.21.0"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/carlos8f/templ.git"
+  },
+  "homepage": "https://github.com/carlos8f/templ",
+  "keywords": [
+    "template",
+    "render",
+    "view",
+    "markup",
+    "html",
+    "bacon"
+  ],
+  "author": "Carlos Rodriguez <carlos@s8f.org> (http://s8f.org/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/carlos8f/templ/issues"
+  }
+}
