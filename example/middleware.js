@@ -2,8 +2,11 @@ var middler = require('middler')
   , templ = require('../')
   , server = require('http').createServer()
 
+var root = process.argv[2] || __dirname;
+var port = Number(typeof process.argv[3] !== 'undefined' && process.argv[3] || 3000);
+
 middler(server)
-  .add(templ(process.argv[2] || __dirname))
+  .add(templ(root))
   .get('/hidden', function (req, res, next) {
     res.render('subdir/hidden');
   })
@@ -13,10 +16,14 @@ middler(server)
   .get('/', function (req, res, next) {
     res.render('index', {title: 'templ example', num: Math.random()});
   })
+  .get('/feed.xml', function (req, res, next) {
+    // render with a custom header
+    res.render('feed', {layout: 'layouts/xml'}, {headers: {'content-type': 'text/xml'}});
+  })
   .add(function (req, res, next) {
     res.renderStatus(404, {title: 'error 404'});
   })
 
-server.listen(0, function() {
+server.listen(port, function() {
   console.log('listening on http://localhost:' + server.address().port + '/');
 });

@@ -66,29 +66,30 @@ module.exports = function (root) {
     }
   }
 
-  function render (p, context, req, res, status) {
+  function render (p, context, req, res, options) {
     if (typeof cache[p] === 'undefined') throw new Error('template not found: ' + p);
 
     var layout = 'layout'
       , html
 
     context || (context = {});
-    context.options || (context.options = {});
-    context.options.headers || (context.options.headers = {});
-    context.options.headers['content-type'] || (context.options.headers['content-type'] = 'text/html');
+    options || (options = {});
+    if (typeof context.layout !== 'undefined') options.layout = context.layout;
+    options.status || (options.status = 200);
+    options.headers || (options.headers = {});
+    options.headers['content-type'] || (options.headers['content-type'] = 'text/html');
 
-    if (context.layout) layout = context.layout;
-    if (context.layout === false) html = cache[p](context);
+    if (options.layout) layout = options.layout;
+    if (options.layout === false) html = cache[p](context);
     else {
       layout = path.sep + layout;
       if (typeof cache[layout] === 'undefined') throw new Error('layout not found: ' + layout);
       context.content = cache[p](context);
       html = cache[layout](context);
     }
-    var serve = dish(html, context.options || null);
-    if (context.options.status) status = context.options.status;
+    var serve = dish(html, options);
     // @todo: dish() does bind(), bad for performance...?
-    serve(req, res, status);
+    serve(req, res, options.status);
   }
 
   var s = saw(root)
@@ -117,10 +118,10 @@ module.exports = function (root) {
     })
 
   return function (req, res, next) {
-    res.render = function (p, context, status) {
+    res.render = function (p, context, options) {
       p = path.sep + p;
-      if (ready) render(p, context, req, res, status);
-      else enqueue(p, context, req, res, status);
+      if (ready) render(p, context, req, res, options);
+      else enqueue(p, context, req, res, options);
     };
     res.renderStatus = function (status, p, context) {
       if (typeof p === 'object') {
@@ -128,7 +129,7 @@ module.exports = function (root) {
         p = null;
       }
       if (!p) p = 'status-' + status;
-      res.render(p, context, status);
+      res.render(p, context, {status: status});
     };
     next();
   };

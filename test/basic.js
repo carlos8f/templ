@@ -8,7 +8,7 @@ describe('basic test', function () {
     rimraf(root, done);
   });
   before(function (done) {
-    server = spawn('node', [path.resolve(__dirname, '..', 'example', 'server.js'), root]);
+    server = spawn('node', [path.resolve(__dirname, '..', 'example', 'middleware.js'), root, '0']);
     process.once('exit', function () {
       server.kill();
     });
@@ -28,7 +28,7 @@ describe('basic test', function () {
       assert(body.match(/<title>templ example<\/title>/));
       assert(body.match(/<h1>templ example<\/h1>/));
       assert(body.match(/your number is: \d\.\d+/));
-      assert(body.match(/<div class="hidden">I am a hidden page!<\/div>/));
+      assert(body.match(/<div class="hidden">this is a partial<\/div>/));
       done();
     });
   });
@@ -41,9 +41,18 @@ describe('basic test', function () {
       done();
     });
   });
+  it('serves xml file', function (done) {
+    request('http://localhost:' + port + '/feed.xml', function (err, resp, body) {
+      assert.ifError(err);
+      assert.equal(resp.statusCode, 200);
+      assert.equal(resp.headers['content-type'], 'text/xml');
+      assert(body.trim().match(/^<xml>this is a fake feed<\/xml>$/));
+      done();
+    });
+  });
   it('update template', function (done) {
     setTimeout(function () {
-      fs.writeFile(path.join(root, 'subdir', 'hidden.hbs'), 'fo shizzle!', function (err) {
+      fs.writeFile(path.join(root, 'subdir', 'partial.hbs'), 'fo shizzle!', function (err) {
         assert.ifError(err);
         setTimeout(done, 1000);
       });
@@ -56,10 +65,10 @@ describe('basic test', function () {
       done();
     });
   });
-  it('serves updated template (raw)', function (done) {
+  it('serves raw template', function (done) {
     request('http://localhost:' + port + '/hidden/raw', function (err, resp, body) {
       assert.ifError(err);
-      assert(body.trim().match(/^fo shizzle!$/));
+      assert(body.trim().match(/^I am a hidden page!$/));
       done();
     });
   });
