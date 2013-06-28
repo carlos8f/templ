@@ -26,13 +26,15 @@ module.exports = function (root) {
   function compile (file, done) {
     var p = getPath(file);
     if (!p) return done && done();
-    fs.readFile(file.fullPath, {encoding: 'utf8'}, function (err, contents) {
+    fs.readFile(file.fullPath, function (err, contents) {
       if (err) {
         if (done) return done(err);
         else throw err;
       }
+      contents = String(contents);
       try {
         cache[p] = handlebars.compile(contents);
+        handlebars.registerPartial(p.replace(path.sep, ''), cache[p]);
       }
       catch (e) {
         remove(file);
@@ -47,6 +49,7 @@ module.exports = function (root) {
     var p = getPath(file);
     if (!p) return;
     delete cache[p];
+    handlebars.registerPartial(p.replace(path.sep, ''), null);
   }
 
   function enqueue () {
