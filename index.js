@@ -131,6 +131,6 @@ module.exports = function (root) {
       if (!p) p = 'status-' + status;
       res.render(p, context, {status: status});
     };
-    next();
+    next && next();
   };
 };

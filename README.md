@@ -73,10 +73,11 @@ var templ = require('templ')()
   , server = require('http').createServer()
 
 server.on('request', function (req, res) {
-  templ(req, res, function () {
-    // now res.render() is available. call with template path and variables
+  templ(req, res);
+  if (req.url === '/') {
     res.render('index', {title: 'basic templ example', num: Math.random()});
-  });
+  }
+  else res.renderStatus(404);
 });
 ```
 
