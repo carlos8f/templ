@@ -31,6 +31,8 @@
     "view",
     "markup",
     "html",
+    "handlebars",
+    "hbs",
     "bacon"
   ],
   "author": "Carlos Rodriguez <carlos@s8f.org> (http://s8f.org/)",

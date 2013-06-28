@@ -1,4 +1,4 @@
-describe('example', function () {
+describe('basic test', function () {
   var server, port, root;
   before(function (done) {
     root = '/tmp/templ-test-' + idgen();
