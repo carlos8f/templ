@@ -19,7 +19,19 @@ describe('example', function () {
   it('hits example', function (done) {
     request('http://localhost:' + port + '/', function (err, resp, body) {
       assert.ifError(err);
-      console.log(body);
+      assert(body.match(/<title>templ example<\/title>/));
+      assert(body.match(/<h1>templ example<\/h1>/));
+      assert(body.match(/your number is: \d\.\d+/));
+      assert(body.match(/<div class="hidden">I am a hidden page!<\/div>/));
+      done();
+    });
+  });
+  it('hits hidden page', function (done) {
+    request('http://localhost:' + port + '/hidden', function (err, resp, body) {
+      assert.ifError(err);
+      assert(body.match(/<title><\/title>/));
+      assert(body.match(/<h1><\/h1>/));
+      assert(body.match(/I am a hidden page!/));
       done();
     });
   });
