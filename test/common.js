@@ -4,3 +4,7 @@ templ = require('../');
 spawn = require('child_process').spawn;
 path = require('path');
 request = require('request');
+idgen = require('idgen');
+rimraf = require('rimraf');
+ncp = require('ncp').ncp;
+fs = require('fs');

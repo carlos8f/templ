@@ -123,6 +123,10 @@ module.exports = function (root) {
       else enqueue(p, context, req, res, status);
     };
     res.renderStatus = function (status, p, context) {
+      if (typeof p === 'object') {
+        context = p;
+        p = null;
+      }
       if (!p) p = 'status-' + status;
       res.render(p, context, status);
     };
