@@ -5,14 +5,26 @@ var handlebars = require('handlebars')
   , path = require('path')
 
 module.exports = function (root) {
-  var ready = false;
+  var ready = false, autoRoot = false;
 
   if (typeof root === 'function') {
     cb = root;
     root = null;
   }
-  root || (root = path.resolve('views'));
-  root = fs.realpathSync(path.resolve(root));
+  if (!root) {
+    root = './views';
+    autoRoot = true;
+  }
+  root || (root = './views');
+  try {
+    root = fs.realpathSync(path.resolve(root));
+  }
+  catch (e) {
+    if (e.code === 'ENOENT' && autoRoot) {
+      root = fs.realpathSync(process.cwd());
+    }
+    else throw e;
+  }
 
   var cache = {}
     , q = []
