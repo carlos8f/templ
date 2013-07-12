@@ -141,7 +141,13 @@ module.exports = function (root) {
         p = null;
       }
       if (!p) p = 'status-' + status;
-      res.render(p, context, {status: status});
+      try {
+        res.render(p, context, {status: status});
+      }
+      catch (e) {
+        res.writeHead(status);
+        res.end();
+      }
     };
     next && next();
   };

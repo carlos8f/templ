@@ -20,6 +20,9 @@ middler(server)
     // render with a custom header
     res.render('feed', {layout: 'layouts/xml'}, {headers: {'content-type': 'text/xml'}});
   })
+  .add('/admin', function (req, res, next) {
+    res.renderStatus(403);
+  })
   .add(function (req, res, next) {
     res.renderStatus(404, {title: 'error 404'});
   })

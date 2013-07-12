@@ -75,9 +75,18 @@ describe('basic test', function () {
   it('serves 404', function (done) {
     request('http://localhost:' + port + '/pony', function (err, resp, body) {
       assert.ifError(err);
+      assert.equal(resp.statusCode, 404);
       assert(body.match(/<title>error 404<\/title>/));
       assert(body.match(/<h1>error 404<\/h1>/));
       assert(body.match(/page not found!/));
+      done();
+    });
+  });
+  it('serves 403', function (done) {
+    request('http://localhost:' + port + '/admin', function (err, resp, body) {
+      assert.ifError(err);
+      assert.equal(resp.statusCode, 403);
+      assert.equal(body, '');
       done();
     });
   });
