@@ -84,7 +84,7 @@ module.exports = function (root) {
     var layout = 'layout'
       , html
 
-    context || (context = {});
+    context || (context = res.vars);
     options || (options = {});
     if (typeof context.layout !== 'undefined') options.layout = context.layout;
     options.status || (options.status = 200);
@@ -149,6 +149,7 @@ module.exports = function (root) {
         res.end();
       }
     };
+    res.vars = {};
     next && next();
   };
 };

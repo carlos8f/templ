@@ -26,6 +26,15 @@ middleware.
 
 ## Usage
 
+`require('templ')(<template root>)` (root defaults to `./views`) gets you a middleware handler
+which provides:
+
+- `res.vars` - template context object, defaults to `{}`
+- `res.render(<template path>, [context], [options])` - end the response with a
+  rendered template. template path is relative to root and should not include extension.
+- `res.renderStatus(<code>, [template path], [context])` - end the response
+  with a specific status code and an optional template path (defaults to `status-{code}`)
+
 ### Middleware
 
 Using [middler](https://github.com/carlos8f/node-middler)
@@ -41,11 +50,13 @@ middler(server)
   .add(templ('path/to/views'))
   .get('/', function (req, res, next) {
     // use layout.hbs as layout, and render index.hbs inside it
+    res.vars.title = 'my title'; // res.vars is the template context
     res.render('index');
   })
   .get('/about', function (req, res, next) {
     // use layouts/about.hbs as layout, and render pages/about.hbs inside it
     // the second argument is available as vars in the templates
+    // you can also pass a specific context object to override res.vars:
     res.render('pages/about', {name: 'carlos'}, {layout: 'layouts/about'});
   })
   .get('/raw', function (req, res, next) {

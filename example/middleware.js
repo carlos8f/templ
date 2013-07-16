@@ -14,7 +14,9 @@ middler(server)
     res.render('subdir/hidden', {layout: false});
   })
   .get('/', function (req, res, next) {
-    res.render('index', {title: 'templ example', num: Math.random()});
+    res.vars.title = 'templ example';
+    res.vars.num = Math.random();
+    res.render('index');
   })
   .get('/feed.xml', function (req, res, next) {
     // render with a custom header
