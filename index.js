@@ -153,3 +153,5 @@ module.exports = function (root) {
     next && next();
   };
 };
+
+module.exports.handlebars = handlebars;
