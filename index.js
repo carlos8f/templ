@@ -94,10 +94,14 @@ module.exports = function (root) {
     if (options.layout) layout = options.layout;
     if (options.layout === false) html = cache[p](context);
     else {
-      layout = path.sep + layout;
-      if (typeof cache[layout] === 'undefined') throw new Error('layout not found: ' + layout);
+      if (typeof layout !== 'function') {
+        // resolve layout basename => cache path => compiled template
+        layout = path.sep + layout;
+        if (typeof cache[layout] === 'undefined') throw new Error('layout not found: ' + layout);
+        layout = cache[layout];
+      }
       context.content = cache[p](context);
-      html = cache[layout](context);
+      html = layout(context);
     }
     var serve = dish(html, options);
     // @todo: dish() does bind(), bad for performance...?

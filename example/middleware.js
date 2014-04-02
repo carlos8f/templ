@@ -29,6 +29,11 @@ middler(server)
   .add('/admin', function (req, res, next) {
     res.renderStatus(403);
   })
+  .get('/layout-override', function (req, res, next) {
+    // override layout by passing a template function, and render pages/about.hbs inside it
+    var precompiled = require('handlebars').compile('<cool>{{{content}}}</cool>');
+    res.render('pages/about', {name: 'carlos'}, {layout: precompiled});
+  })
   .add(function (req, res, next) {
     res.renderStatus(404, {title: 'error 404'});
   })

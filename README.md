@@ -55,7 +55,6 @@ middler(server)
   })
   .get('/about', function (req, res, next) {
     // use layouts/about.hbs as layout, and render pages/about.hbs inside it
-    // the second argument is available as vars in the templates
     // you can also pass a specific context object to override res.vars:
     res.render('pages/about', {name: 'carlos'}, {layout: 'layouts/about'});
   })
@@ -66,6 +65,11 @@ middler(server)
   .get('/feed.xml', function (req, res, next) {
     // render feed.hbs with a custom header
     res.render('feed', null, {headers: {'content-type': 'text/xml'}});
+  })
+  .get('/layout-override', function (req, res, next) {
+    // override layout by passing a template function, and render pages/about.hbs inside it
+    var precompiled = require('handlebars').compile('<cool>{{{content}}}</cool>');
+    res.render('pages/about', {name: 'carlos'}, {layout: precompiled});
   })
   .add(function (req, res, next) {
     // 404 status code, use layout.hbs as layout, and render

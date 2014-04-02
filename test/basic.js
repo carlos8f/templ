@@ -72,6 +72,13 @@ describe('basic test', function () {
       done();
     });
   });
+  it('precompiled layout override', function (done) {
+    request('http://localhost:' + port + '/layout-override', function (err, resp, body) {
+      assert.ifError(err);
+      assert(body.trim().match(/^<cool>Hi, my name is carlos.<\/cool>$/));
+      done();
+    });
+  });
   it('serves 404', function (done) {
     request('http://localhost:' + port + '/pony', function (err, resp, body) {
       assert.ifError(err);
