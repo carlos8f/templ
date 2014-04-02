@@ -129,7 +129,7 @@ module.exports = function (root) {
       });
     })
 
-  return function (req, res, next) {
+  var middleware = function (req, res, next) {
     res.render = function (p, context, options) {
       p = path.sep + p;
       if (ready) render(p, context, req, res, options);
@@ -152,6 +152,11 @@ module.exports = function (root) {
     res.vars = {};
     next && next();
   };
+
+  // expose cache, but it should NOT be altered externally.
+  middleware._cache = cache;
+
+  return middleware;
 };
 
 module.exports.handlebars = handlebars;

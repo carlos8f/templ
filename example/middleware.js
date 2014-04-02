@@ -1,12 +1,16 @@
 var middler = require('middler')
   , templ = require('../')
   , server = require('http').createServer()
+  , assert = require('assert')
 
 var root = process.argv[2] || __dirname;
 var port = Number(typeof process.argv[3] !== 'undefined' && process.argv[3] || 3000);
 
+var middleware = templ(root);
+assert(middleware._cache, '_cache should be the exposed cache property');
+
 middler(server)
-  .add(templ(root))
+  .add(middleware)
   .get('/hidden', function (req, res, next) {
     res.render('subdir/hidden');
   })
