@@ -1,6 +1,6 @@
 {
   "name": "templ",
-  "version": "0.1.8",
+  "version": "1.0.0",
   "description": "yet another lightweight templating thing",
   "main": "index.js",
   "dependencies": {
