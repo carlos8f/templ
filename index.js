@@ -27,11 +27,9 @@ module.exports = function (pattern, options) {
 
   var cache = {}
     , q = []
-    , ext = /\.(hbs|handlebars|tpl|html|htm)$/
     , ready = false
 
   function getPath (file) {
-    if (!options.cwd && !file.name.match(ext)) return false;
     return file.fullPath.replace(options.cwd, '').replace(/\.[^\.]+$/, '');
   }
 
