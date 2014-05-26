@@ -4,35 +4,35 @@ var handlebars = require('handlebars')
   , dish = require('dish')
   , path = require('path')
 
-module.exports = function (root) {
-  var ready = false, autoRoot = false;
+module.exports = function (pattern, options) {
+  if (pattern && pattern.constructor === Object) {
+    options = pattern;
+    pattern = null;
+  }
+  options || (options = {});
+  if (Array.isArray(pattern)) pattern = '{' + (pattern.join(',')) + '}';
+  else if (!pattern) pattern = './views';
 
-  if (typeof root === 'function') {
-    cb = root;
-    root = null;
-  }
-  if (!root) {
-    root = './views';
-    autoRoot = true;
-  }
-  root || (root = './views');
   try {
-    root = fs.realpathSync(path.resolve(root));
+    var stat = fs.statSync(pattern);
+    if (stat && stat.isDirectory()) {
+      options.cwd || (options.cwd = path.resolve(pattern));
+      pattern = pattern.replace(path.sep, '/');
+      pattern = pattern.replace(new RegExp(path.sep + '$', ''), '') + '/**/*.hbs';
+    }
   }
   catch (e) {
-    if (e.code === 'ENOENT' && autoRoot) {
-      root = fs.realpathSync(process.cwd());
-    }
-    else throw e;
+    options.cwd || (options.cwd = path.resolve(process.cwd()));
   }
 
   var cache = {}
     , q = []
     , ext = /\.(hbs|handlebars|tpl|html|htm)$/
+    , ready = false
 
   function getPath (file) {
-    if (!file.name.match(ext)) return false;
-    return file.fullPath.replace(root, '').replace(/^\/views/, '').replace(ext, '');
+    if (!options.cwd && !file.name.match(ext)) return false;
+    return file.fullPath.replace(options.cwd, '').replace(/\.[^\.]+$/, '');
   }
 
   function compile (file, done) {
@@ -69,12 +69,11 @@ module.exports = function (root) {
   }
 
   function renderQueue () {
-    ready = true;
+    if (!ready) return;
     var args = q.shift();
     if (args) {
       render.apply(null, args);
-      if (typeof setImmediate !== 'undefined') setImmediate(renderQueue);
-      else process.nextTick(renderQueue);
+      setImmediate(renderQueue);
     }
   }
 
@@ -108,7 +107,7 @@ module.exports = function (root) {
     serve(req, res, options.status);
   }
 
-  var s = saw(root)
+  var s = saw(pattern, {cwd: options.cwd})
     .on('all', function (ev, file) {
       switch (ev) {
         case 'add':
@@ -128,7 +127,10 @@ module.exports = function (root) {
             errored = true;
             throw err;
           }
-          if (!--latch) renderQueue();
+          if (!--latch) {
+            ready = true;
+            renderQueue();
+          }
         });
       });
     })

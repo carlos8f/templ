@@ -4,10 +4,10 @@
   "description": "yet another lightweight templating thing",
   "main": "index.js",
   "dependencies": {
-    "saw": "~0.5.1",
-    "handlebars": "~1.3.0",
+    "dish": "~0.1.2",
     "graceful-fs": "~1.2.2",
-    "dish": "~0.1.2"
+    "handlebars": "~1.0.12",
+    "saw": "~0.5.1"
   },
   "devDependencies": {
     "mocha": "*",
