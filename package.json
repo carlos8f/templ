@@ -4,9 +4,9 @@
   "description": "yet another lightweight templating thing",
   "main": "index.js",
   "dependencies": {
-    "dish": "^1.0.1",
-    "graceful-fs": "~1.2.2",
-    "handlebars": "~1.0.12",
+    "dish": "^1.0.3",
+    "graceful-fs": "^2.0.3",
+    "handlebars": "^2.0.0-alpha.4",
     "saw": "^1.0.4"
   },
   "devDependencies": {

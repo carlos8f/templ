@@ -103,8 +103,7 @@ module.exports = function (pattern, options) {
       html = layout(context);
     }
     var serve = dish(html, options);
-    // @todo: dish() does bind(), bad for performance...?
-    serve(req, res, options.status);
+    serve(req, res);
   }
 
   var s = saw(pattern, {cwd: options.cwd})
