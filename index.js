@@ -13,7 +13,7 @@ module.exports = function (pattern, options) {
   if (Array.isArray(pattern)) {
     pattern = pattern.length < 2 ? pattern[0] : '{' + (pattern.join(',')) + '}';
   }
-  else if (!pattern) pattern = './views';
+  else if (!pattern) pattern = path.join(options.cwd || process.cwd(), 'views');
 
   try {
     var stat = fs.statSync(pattern);

@@ -1,9 +1,10 @@
 var middler = require('middler')
+  , path = require('path')
   , templ = require('../')
   , server = require('http').createServer()
   , assert = require('assert')
 
-var root = process.argv[2] || __dirname;
+var root = process.argv[2] || path.join(__dirname, 'views');
 var port = Number(typeof process.argv[3] !== 'undefined' && process.argv[3] || 3000);
 
 var middleware = templ(root);

@@ -1,4 +1,5 @@
-var templ = require('../')()
+var path = require('path')
+  , templ = require('../')(path.join(__dirname, 'views'))
   , server = require('http').createServer()
 
 server.on('request', function (req, res) {
