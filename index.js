@@ -10,7 +10,9 @@ module.exports = function (pattern, options) {
     pattern = null;
   }
   options || (options = {});
-  if (Array.isArray(pattern)) pattern = '{' + (pattern.join(',')) + '}';
+  if (Array.isArray(pattern)) {
+    pattern = pattern.length < 2 ? pattern[0] : '{' + (pattern.join(',')) + '}';
+  }
   else if (!pattern) pattern = './views';
 
   try {
@@ -27,7 +29,6 @@ module.exports = function (pattern, options) {
 
   var cache = {}
     , q = []
-    , ready = false
 
   function getPath (file) {
     return file.fullPath.replace(options.cwd, '').replace(/\.[^\.]+$/, '');
@@ -67,7 +68,7 @@ module.exports = function (pattern, options) {
   }
 
   function renderQueue () {
-    if (!ready) return;
+    if (!s.ready) return;
     var args = q.shift();
     if (args) {
       render.apply(null, args);
@@ -124,10 +125,7 @@ module.exports = function (pattern, options) {
             errored = true;
             throw err;
           }
-          if (!--latch) {
-            ready = true;
-            renderQueue();
-          }
+          if (!--latch) renderQueue();
         });
       });
     })
@@ -135,7 +133,7 @@ module.exports = function (pattern, options) {
   var middleware = function (req, res, next) {
     res.render = function (p, context, options) {
       p = path.sep + p;
-      if (ready) render(p, context, req, res, options);
+      if (s.ready) render(p, context, req, res, options);
       else enqueue(p, context, req, res, options);
     };
     res.renderStatus = function (status, p, context) {
