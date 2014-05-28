@@ -117,7 +117,10 @@ module.exports = function (pattern, options) {
       }
     })
     .once('ready', function (files) {
-      if (!files.length) return renderQueue();
+      if (!files.length) {
+        ready = true;
+        return renderQueue();
+      }
       var latch = files.length, errored = false;
       files.forEach(function (file) {
         compile(file, function (err) {
