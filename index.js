@@ -29,6 +29,7 @@ module.exports = function (pattern, options) {
 
   var cache = {}
     , q = []
+    , ready = false
 
   function getPath (file) {
     return file.fullPath.replace(options.cwd, '').replace(/\.[^\.]+$/, '');
@@ -68,7 +69,7 @@ module.exports = function (pattern, options) {
   }
 
   function renderQueue () {
-    if (!s.ready) return;
+    if (!ready) return;
     var args = q.shift();
     if (args) {
       render.apply(null, args);
@@ -125,7 +126,10 @@ module.exports = function (pattern, options) {
             errored = true;
             throw err;
           }
-          if (!--latch) renderQueue();
+          if (!--latch) {
+            ready = true;
+            renderQueue();
+          }
         });
       });
     })
@@ -133,7 +137,7 @@ module.exports = function (pattern, options) {
   var middleware = function (req, res, next) {
     res.render = function (p, context, options) {
       p = path.sep + p;
-      if (s.ready) render(p, context, req, res, options);
+      if (ready) render(p, context, req, res, options);
       else enqueue(p, context, req, res, options);
     };
     res.renderStatus = function (status, p, context) {
