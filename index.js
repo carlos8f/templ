@@ -18,17 +18,19 @@ module.exports = function (pattern, options) {
   try {
     var stat = fs.statSync(pattern);
     if (stat && stat.isDirectory()) {
-      options.cwd || (options.cwd = path.resolve(pattern));
+      options.cwd || (options.cwd = pattern);
       pattern = pattern.replace(path.sep, '/');
       pattern = pattern.replace(new RegExp(path.sep + '$', ''), '') + '/**/*.hbs';
     }
   }
   catch (e) {
-    options.cwd || (options.cwd = path.resolve(process.cwd()));
+    options.cwd || (options.cwd = process.cwd());
   }
 
+  options.cwd = path.resolve(options.cwd);
+
   var patterns = pattern.replace(/\{|\}/g, '').split(',');
-  var stripDirs = [];
+  var stripDirs = [options.cwd];
   patterns.forEach(function (p) {
     var dir = p.replace(/(\*\*\/)?[^\/]*\*[^\/]*/, '');
     if (dir) stripDirs.push(path.resolve(options.cwd, dir));
