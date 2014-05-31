@@ -30,11 +30,12 @@ module.exports = function (pattern, options) {
   options.cwd = path.resolve(options.cwd);
 
   var patterns = pattern.replace(/\{|\}/g, '').split(',');
-  var stripDirs = [options.cwd];
+  var stripDirs = [];
   patterns.forEach(function (p) {
     var dir = p.replace(/(\*\*\/)?[^\/]*\*[^\/]*/, '');
     if (dir) stripDirs.push(path.resolve(options.cwd, dir));
   });
+  if (!stripDirs.length) stripDirs.push(options.cwd);
   var stripRegex = new RegExp(stripDirs.join('|'));
 
   var cache = {}
