@@ -27,12 +27,20 @@ module.exports = function (pattern, options) {
     options.cwd || (options.cwd = path.resolve(process.cwd()));
   }
 
+  var patterns = pattern.replace(/\{|\}/g, '').split(',');
+  var stripDirs = [];
+  patterns.forEach(function (p) {
+    var dir = p.replace(/(\*\*\/)?[^\/]*\*[^\/]*/, '');
+    if (dir) stripDirs.push(path.resolve(options.cwd, dir));
+  });
+  var stripRegex = new RegExp(stripDirs.join('|'));
+
   var cache = {}
     , q = []
     , ready = false
 
   function getPath (file) {
-    return file.fullPath.replace(options.cwd, '').replace(/\.[^\.]+$/, '');
+    return file.fullPath.replace(stripRegex, '').replace(/\.[^\.]+$/, '');
   }
 
   function compile (file, done) {
