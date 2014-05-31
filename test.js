@@ -1,14 +1,25 @@
+assert = require('assert');
+util = require('util');
+templ = require('./');
+spawn = require('child_process').spawn;
+path = require('path');
+request = require('request');
+idgen = require('idgen');
+rimraf = require('rimraf');
+ncp = require('ncp').ncp;
+fs = require('graceful-fs');
+
 describe('basic test', function () {
   var server, port, root;
   before(function (done) {
     root = '/tmp/templ-test-' + idgen();
-    ncp(path.join(__dirname, '..', 'example', 'views'), root, done);
+    ncp(path.join(__dirname, 'example', 'views'), root, done);
   });
   after(function (done) {
     rimraf(root, done);
   });
   before(function (done) {
-    server = spawn('node', [path.resolve(__dirname, '..', 'example', 'middleware.js'), root, '0']);
+    server = spawn('node', [path.resolve(__dirname, 'example', 'middleware.js'), root, '0']);
     process.once('exit', function () {
       server.kill();
     });

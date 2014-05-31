@@ -18,7 +18,7 @@
     "ncp": "~0.4.2"
   },
   "scripts": {
-    "test": "make test"
+    "test": "./node_modules/.bin/mocha --reporter spec --bail --timeout 10s"
   },
   "repository": {
     "type": "git",
