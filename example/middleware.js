@@ -8,7 +8,6 @@ var root = process.argv[2] || path.join(__dirname, 'views');
 var port = Number(typeof process.argv[3] !== 'undefined' && process.argv[3] || 3000);
 
 var middleware = templ(root);
-assert(middleware._cache, '_cache should be the exposed cache property');
 
 middler(server)
   .add(middleware)
