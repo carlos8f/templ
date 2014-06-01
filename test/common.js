@@ -7,4 +7,4 @@ request = require('request');
 idgen = require('idgen');
 rimraf = require('rimraf');
 ncp = require('ncp').ncp;
-fs = require('graceful-fs');
+fs = require('fs');
