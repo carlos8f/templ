@@ -52,7 +52,7 @@ Templ.prototype.middleware = function () {
       var file = self.cache.values().filter(function (file) {
         return file.pluginPath === '/' + p;
       }).pop();
-      if (typeof file === 'undefined') throw new Error('template not found: ' + p);
+      if (typeof file === 'undefined' || file.deleted) throw new Error('template not found: ' + p);
       var layout = 'layout'
         , html
       context || (context = res.vars);
@@ -70,7 +70,7 @@ Templ.prototype.middleware = function () {
           var layoutFile = self.cache.values().filter(function (file) {
             return file.pluginPath === '/' + layout;
           }).pop();
-          if (typeof layoutFile === 'undefined') throw new Error('layout not found: ' + layout);
+          if (typeof layoutFile === 'undefined' || layoutFile.deleted) throw new Error('layout not found: ' + layout);
           layout = layoutFile.template;
         }
         context.content = file.template(context);
