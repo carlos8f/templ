@@ -1,13 +1,12 @@
 {
   "name": "templ",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "yet another lightweight templating thing",
   "main": "index.js",
   "dependencies": {
     "dish": "^1.0.3",
-    "graceful-fs": "^2.0.3",
-    "handlebars": "^2.0.0-alpha.4",
-    "saw": "^1.0.4"
+    "dollop": "git+https://gist.github.com/30be6b580efaf8d74074.git",
+    "handlebars": "^2.0.0-alpha.4"
   },
   "devDependencies": {
     "mocha": "*",
