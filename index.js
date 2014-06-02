@@ -1,87 +1,64 @@
 var handlebars = require('handlebars')
-  , dollop = require('dollop')
+  , Mayonnaise = require('mayonnaise').Mayonnaise
   , dish = require('dish')
   , path = require('path')
   , inherits = require('util').inherits
 
-function Templ (globs, options) {
-  if (globs.constructor === Object) {
-    options = globs;
-    globs = null;
+function Templ (specs, options) {
+  if (specs.constructor === Object) {
+    options = specs;
+    specs = null;
   }
-  if (!globs) globs = 'views/**/*.hbs';
-  dollop.Dollop.call(this, globs, options);
-  var self = this;
-  this.once('ready', function (files) {
-    files.forEach(function (file) {
-      if (file.stat.isFile()) self.compile(file);
-    });
-  });
-  this.on('all', function (ev, file) {
-    switch (ev) {
-      case 'add':
-      case 'update':
-        return self.compile(file);
-      case 'remove':
-        return self.remove(file);
+  if (!specs) specs = 'views/**/*.hbs';
+  Mayonnaise.call(this, specs, options);
+  this.on('all', function (op, file) {
+    switch (op) {
+      case 'add': case 'update':
+        handlebars.registerPartial(file.pluginPath, file.plugin);
+        break;
     }
   });
 }
-inherits(Templ, dollop.Dollop);
+inherits(Templ, Mayonnaise);
 
 Templ.prototype.compile = function (file) {
-  try {
-    file.template = handlebars.compile(file.readSync({encoding: 'utf8'}));
-    handlebars.registerPartial(file.pluginPath.replace(/^\//, ''), file.template);
+  if (file.name.match(/\.(hbs|handlebars)$/)) {
+    var template = handlebars.compile(file.data({nocache: true, encoding: 'utf8'}));
+    handlebars.registerPartial(file.pluginPath.replace(/^\//, ''), template);
+    return template;
   }
-  catch (e) {
-    throw e;
-    this.cache.del(file.key);
-  }
-};
-
-Templ.prototype.remove = function (file) {
-  this.cache.del(file.key);
-  handlebars.registerPartial(file.pluginPath, null);
 };
 
 Templ.prototype.middleware = function () {
   var self = this;
   return function (req, res, next) {
-    function render (p, context, options) {
-      var file = self.cache.values().filter(function (file) {
-        return file.pluginPath === '/' + p;
-      }).pop();
-      if (typeof file === 'undefined' || file.deleted) throw new Error('template not found: ' + p);
-      var layout = 'layout'
-        , html
-      context || (context = res.vars);
-      options || (options = {});
-      if (typeof context.layout !== 'undefined') options.layout = context.layout;
-      options.status || (options.status = 200);
-      options.headers || (options.headers = {});
-      options.headers['content-type'] || (options.headers['content-type'] = 'text/html');
-
-      if (options.layout) layout = options.layout;
-      if (options.layout === false) html = file.template(context);
-      else {
-        if (typeof layout !== 'function') {
-          // resolve layout basename => cache path => compiled template
-          var layoutFile = self.cache.values().filter(function (file) {
-            return file.pluginPath === '/' + layout;
-          }).pop();
-          if (typeof layoutFile === 'undefined' || layoutFile.deleted) throw new Error('layout not found: ' + layout);
-          layout = layoutFile.template;
-        }
-        context.content = file.template(context);
-        html = layout(context);
-      }
-      var serve = dish(html, options);
-      serve(req, res);
-    }
+    // instrument res with render methods
     res.render = function (p, context, options) {
-      if (self.ready) render(p, context, options);
-      else self.once('ready', function () { render(p, context, options) });
+      function render () {
+        var file = self.getPlugin(p);
+        if (typeof file === 'undefined') throw new Error('template not found: ' + p);
+        var layout = 'layout', rendered;
+        context || (context = res.vars);
+        options || (options = {});
+        if (typeof context.layout !== 'undefined') options.layout = context.layout;
+        options.status || (options.status = 200);
+        options.headers || (options.headers = {});
+        options.headers['content-type'] || (options.headers['content-type'] = 'text/html');
+
+        if (options.layout) layout = options.layout;
+        if (options.layout === false) dish(file.plugin(context), options)(req, res, next);
+        else {
+          if (typeof layout !== 'function') {
+            var layoutFile = self.getPlugin(layout);
+            if (typeof layoutFile === 'undefined') throw new Error('layout not found: ' + layout);
+            layout = layoutFile.plugin;
+          }
+          context.content = file.plugin(context);
+          dish(layout(context), options)(req, res, next);
+        }
+      }
+      if (self.ready) render();
+      else self.once('ready', render);
     };
     res.renderStatus = function (status, p, context) {
       if (typeof p === 'object') {
@@ -102,11 +79,8 @@ Templ.prototype.middleware = function () {
   };
 };
 
-module.exports = function (globs, options) {
-  var t = new Templ(globs, options);
-  var mw = t.middleware();
-  mw._cache = t.cache;
-  return mw;
+module.exports = function (specs, options) {
+  return new Templ(specs, options).middleware();
 };
 
 module.exports.Templ = Templ;
