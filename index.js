@@ -23,7 +23,7 @@ inherits(Templ, Mayonnaise);
 
 Templ.prototype.compile = function (file) {
   if (file.name.match(/\.(hbs|handlebars)$/)) {
-    var template = handlebars.compile(file.data({nocache: true, encoding: 'utf8'}));
+    var template = handlebars.compile(file.data({encoding: 'utf8'}));
     handlebars.registerPartial(file.pluginPath.replace(/^\//, ''), template);
     return template;
   }
