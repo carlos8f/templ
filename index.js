@@ -35,8 +35,8 @@ Templ.prototype.middleware = function () {
     // instrument res with render methods
     res.render = function (p, context, options) {
       function render () {
-        var file = self.getPlugin(p);
-        if (typeof file === 'undefined') throw new Error('template not found: ' + p);
+        var template = self.getPlugin(p);
+        if (typeof template === 'undefined') throw new Error('template not found: ' + p);
         var layout = 'layout', rendered;
         context || (context = res.vars);
         options || (options = {});
@@ -46,14 +46,13 @@ Templ.prototype.middleware = function () {
         options.headers['content-type'] || (options.headers['content-type'] = 'text/html');
 
         if (options.layout) layout = options.layout;
-        if (options.layout === false) dish(file.plugin(context), options)(req, res, next);
+        if (options.layout === false) dish(template(context), options)(req, res, next);
         else {
           if (typeof layout !== 'function') {
-            var layoutFile = self.getPlugin(layout);
-            if (typeof layoutFile === 'undefined') throw new Error('layout not found: ' + layout);
-            layout = layoutFile.plugin;
+            layout = self.getPlugin(layout);
+            if (typeof layout === 'undefined') throw new Error('layout not found: ' + layout);
           }
-          context.content = file.plugin(context);
+          context.content = template(context);
           dish(layout(context), options)(req, res, next);
         }
       }
