@@ -2,6 +2,7 @@ var handlebars = require('handlebars')
   , Mayonnaise = require('mayonnaise').Mayonnaise
   , dish = require('dish')
   , path = require('path')
+  , fs = require('fs')
   , inherits = require('util').inherits
 
 function Templ (specs, options) {
@@ -9,7 +10,6 @@ function Templ (specs, options) {
     options = specs;
     specs = null;
   }
-  if (!specs) specs = 'views/**/*.hbs';
   Mayonnaise.call(this, specs, options);
   this.on('all', function (op, file) {
     switch (op) {
@@ -20,6 +20,12 @@ function Templ (specs, options) {
   });
 }
 inherits(Templ, Mayonnaise);
+
+Templ.prototype.makePluginPath = function (file) {
+  return file.key
+    .replace(/\.[^\.]+$/, '')
+    .replace(/^\//, '');
+};
 
 Templ.prototype.compile = function (file) {
   if (file.name.match(/\.(hbs|handlebars)$/)) {
@@ -80,8 +86,15 @@ Templ.prototype.middleware = function () {
   };
 };
 
-module.exports = function (specs, options) {
-  return new Templ(specs, options).middleware();
+module.exports = function (root, options) {
+  if (!root) {
+    try {
+      var stat = fs.statSync('views');
+      root = path.resolve('views');
+    }
+    catch (e) {}
+  }
+  return new Templ([{globs: '**/*.hbs', cwd: root}], options).middleware(options);
 };
 
 module.exports.Templ = Templ;
