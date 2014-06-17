@@ -79,7 +79,7 @@ Templ.prototype.middleware = function () {
         res.end();
       }
     };
-    res.vars = {};
+    res.vars || (res.vars = {});
     next && next();
   };
 };
