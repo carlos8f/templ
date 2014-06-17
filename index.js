@@ -29,9 +29,7 @@ Templ.prototype.makePluginPath = function (file) {
 
 Templ.prototype.compile = function (file) {
   if (file.name.match(/\.(hbs|handlebars)$/)) {
-    var template = handlebars.compile(file.data({encoding: 'utf8'}));
-    handlebars.registerPartial(file.pluginPath.replace(/^\//, ''), template);
-    return template;
+    return handlebars.compile(file.data({encoding: 'utf8'}));
   }
 };
 
