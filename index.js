@@ -6,15 +6,17 @@ var handlebars = require('handlebars')
   , inherits = require('util').inherits
 
 function Templ (specs, options) {
+  var self = this;
   if (specs.constructor === Object) {
     options = specs;
     specs = null;
   }
   Mayonnaise.call(this, specs, options);
+  self.handlebars = handlebars.create();
   this.on('all', function (op, file) {
     switch (op) {
       case 'add': case 'update':
-        handlebars.registerPartial(file.pluginPath, file.plugin);
+        self.handlebars.registerPartial(file.pluginPath, file.plugin);
         break;
     }
   });
@@ -29,7 +31,7 @@ Templ.prototype.makePluginPath = function (file) {
 
 Templ.prototype.compile = function (file) {
   if (file.name.match(/\.(hbs|handlebars)$/)) {
-    return handlebars.compile(file.data({encoding: 'utf8'}));
+    return this.handlebars.compile(file.data({encoding: 'utf8'}));
   }
 };
 
@@ -96,4 +98,3 @@ module.exports = function (root, options) {
 };
 
 module.exports.Templ = Templ;
-module.exports.handlebars = handlebars;
