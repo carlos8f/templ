@@ -11,8 +11,11 @@ function Templ (specs, options) {
     options = specs;
     specs = null;
   }
+  options || (options = {});
+  if (options.handlebars) this.handlebars = options.handlebars;
+  else this.handlebars = handlebars.create();
+
   Mayonnaise.call(this, specs, options);
-  self.handlebars = handlebars.create();
   this.on('all', function (op, file) {
     switch (op) {
       case 'add': case 'update':
