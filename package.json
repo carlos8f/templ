@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "dish": "^1.0.3",
-    "mayonnaise": "git+https://gist.github.com/cd931ba95481a7570602.git",
+    "mayonnaise": "^0.3.1",
     "handlebars": "^2.0.0-alpha.4"
   },
   "devDependencies": {
